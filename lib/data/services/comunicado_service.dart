@@ -1,24 +1,44 @@
+// lib/data/services/comunicado_service.dart
+
 import 'dart:convert';
+import 'dart:math';
+import 'package:agenda_mobile/core/constants/api.dart';
 import 'package:http/http.dart' as http;
-import '../models/comunicados.dart';
+import 'package:agenda_mobile/data/models/comunicados.dart';
 
 class ComunicadoService {
   final String baseUrl;
-  final String sessionId = '42fb70afba04bbb162bd852547bd7a321f17ce5f';
 
-  ComunicadoService({required this.baseUrl});
+  ComunicadoService({this.baseUrl = apiBack});
 
-  Future<List<Comunicado>> fetchComunicados() async {
-    final response = await http.get(Uri.parse('$baseUrl/api/comunicados'),
-    headers: {
-        'Cookie': 'session_id=$sessionId', // Enviar session_id como cookie
-      },);
-    print(response.body);
+  Future<List<Comunicado>> fetchComunicados(String fecha, String token) async {
+    print(token);
+    final request = http.Request(
+      'GET',
+      Uri.parse('$baseUrl/api/comunicados?fecha=$fecha'),
+    );
+
+    request.body = jsonEncode({});
+    request.headers.addAll({
+      'Content-Type': 'application/json',
+      // 'Authorization': 'Bearer $token',
+      'Cookie': 'session_id=$token',
+      // 'Cookie': 'session_id=$token',
+    });
+    http.StreamedResponse response = await request.send();
+    var body = await response.stream.bytesToString();
+
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      return data.map((json) => Comunicado.fromJson(json)).toList();
+      final data = json.decode(body)['result'];
+      if (data['status'] == 'success') {
+        return (data['data'] as List)
+            .map((comunicado) => Comunicado.fromJson(comunicado))
+            .toList();
+      } else {
+        throw Exception('Failed to load comunicados');
+      }
     } else {
-      throw Exception('Failed to load announcements');
+      throw Exception('Failed to load comunicados');
     }
   }
 }

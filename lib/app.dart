@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'routes.dart';
 
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         navigationBarTheme: const NavigationBarThemeData(backgroundColor: Colors.blue)
       ),
-      initialRoute: '/',
+      initialRoute: '/login',
       routes: appRoutes, // Llamamos a las rutas desde routes.dart
     );
   }

@@ -1,0 +1,61 @@
+{
+  "themes": {
+    "azul": {
+      "primaryColor": "#002C87",
+      "secondaryColor": "#ADD8E6",
+      "backgroundColor": "#F0F8FF",
+      "backcontainer": "#FFFFFF",
+      "background": "#0386D0",
+      "image": "assets/images/camiondefondo.png",
+      "logo": "assets/images/logofhcargo.png",
+      "upperImage": "assets/images/rectangle17.png",
+      "lowerImage": "assets/images/rectangle18.png",
+      "companyName": "FGCargo",
+      "companySlogan": "Tu socio en logística Internacional",
+      "containerColor": "rgba(255, 255, 255, 0.70)",
+      "containerShadow": "0px 4px 14px 0px rgba(0, 0, 0, 0.74)",
+      "textColor": "#0386D0",
+      "graytext": "#A6A6A6",
+      "warningColor": "ff0000",
+      "errorColor": "d8cf0f",
+      "orangeColor": "#FBBC05",
+      "modalBackground": "#1B1B1B"
+      
+
+    },
+    "verde": {
+      "primaryColor": "#145c02",
+      "secondaryColor": "#22810a",
+      "backgroundColor": "#F0F8FF",
+      "backcontainer": "#F0F8FF",
+      "background": "#0386D0",
+      "image": "assets/images/camiondefondo.png",
+      "logo": "assets/images/logofhcargo.png",
+      "companyName": "Nombre de la asd",
+      "companySlogan": "Dicho de la asd",
+      "containerColor": "#FFFFFFBD",
+      "containerShadow": "0px 4px 14px 0px #000000AD",
+      "textColor": "#348120",
+      "graytext": "#A6A6A6",
+      "orangeColor": "#FBBC05",
+      "modalBackground": "#1B1B1B"
+    },
+    "rosa": {
+      "primaryColor": "#620c67",
+      "secondaryColor": "#631c67",
+      "backgroundColor": "#F0F8FF",
+      "backcontainer": "#F0F8FF",
+      "background": "#0386D0",
+      "image": "assets/images/camiondefondo.png",
+      "logo": "assets/images/logofhcargo.png",
+      "companyName": "Nombre de la asssssssss",
+      "companySlogan": "Dicho de la asd",
+      "containerColor": "#FFFFFFBD",
+      "containerShadow": "0px 4px 14px 0px #000000AD",
+      "textColor": "#7c1781",
+      "graytext": "#A6A6A6",
+      "orangeColor": "#FBBC05",
+      "modalBackground": "#1B1B1B"
+    }
+  }
+}

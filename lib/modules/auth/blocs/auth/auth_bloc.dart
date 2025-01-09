@@ -1,38 +1,31 @@
-import 'package:bloc/bloc.dart';
+import 'package:agenda_mobile/data/models/auth.dart';
+import 'package:agenda_mobile/data/services/auth_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
+  final AuthService authService;
 
-  AuthBloc() : super(AuthInitial()) {
-
-    on<LoginEvent>((event, emit) async {
-      emit(AuthLoading());
-
-      try {
-        // Simula una llamada a un servicio o API para autenticar al usuario
-        final bool isAuthenticated = await _authenticateUser(event.email, event.password);
-
-        if (isAuthenticated) {
-          // Si la autenticación es exitosa, emitir estado de éxito
-          emit(AuthSuccess()); // Aquí deberías pasar el userId real o el dato correspondiente
-        } else {
-          // Si la autenticación falla, emitir estado de fallo con mensaje de error
-          emit(AuthFailure(error: 'Invalid email or password'));
-        }
-      } catch (e) {
-        // Si hay un error inesperado, emitir estado de fallo con un mensaje de error
-        emit(AuthFailure(error: e.toString()));
-      }
-    });
-
+  AuthBloc(this.authService) : super(AuthInitial()) {
+    on<LoginEvent>(_onLogin);
+    on<LogoutEvent>(_onLogout);
   }
 
-    Future<bool> _authenticateUser(String email, String password) async {
-    // Lógica de autenticación que conecte con el repositorio o servicio
-    return email == "test@example.com" && password == "password";
+  Future<void> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      final response = await authService.login(event.username, event.password);
+      final authResponse = AuthResponse.fromJson(response);
+      emit(Authenticated(authResponse));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
   }
 
+  void _onLogout(LogoutEvent event, Emitter<AuthState> emit) {
+    emit(Unauthenticated());
+  }
 }

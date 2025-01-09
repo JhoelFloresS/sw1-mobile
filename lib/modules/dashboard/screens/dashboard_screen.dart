@@ -1,10 +1,10 @@
-// dashboard_screen.dart
-
 import 'package:agenda_mobile/core/layouts/layout.dart';
-import 'package:agenda_mobile/data/models/comunicados.dart';
 import 'package:agenda_mobile/data/services/comunicado_service.dart';
+import 'package:agenda_mobile/modules/dashboard/blocs/comunicados/comunicados_bloc.dart';
+import 'package:agenda_mobile/modules/dashboard/blocs/notification/notifications_bloc.dart';
 import 'package:agenda_mobile/modules/dashboard/wdigets/calendar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DashboardScreen extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -28,61 +28,112 @@ class DashboardScreen extends StatelessWidget {
                   PlannerCalendar(),
                   const SizedBox(height: 20),
                   Expanded(
-                    child: FutureBuilder<List<Comunicado>>(
-                      future: ComunicadoService(baseUrl: "http://192.168.100.158:8069").fetchComunicados(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                    child: BlocBuilder<ComunicadoBloc, ComunicadoState>(
+                      builder: (context, state) {
+                        String currentDate =
+                            DateTime.now().toString().split(' ')[0];
+                        if (state is ComunicadoInitial) {
+                          context
+                              .read<ComunicadoBloc>()
+                              .add(FetchComunicadosEvent(fecha: currentDate));
+                        }
+                        if (state is ComunicadoLoading) {
                           return Center(child: CircularProgressIndicator());
                         }
 
-                        if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
+                        if (state is ComunicadoError) {
+                          return Center(child: Text('Error: ${state.error}'));
                         }
 
-                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return Center(child: Text('No hay comunicados'));
+                        if (state is ComunicadoLoaded) {
+                          final comunicados = state.comunicados;
+
+                          if (comunicados.isEmpty) {
+                            return Center(child: Text('No hay comunicados'));
+                          }
+
+                          return ListView.builder(
+                            itemCount: comunicados.length,
+                            itemBuilder: (context, index) {
+                              final comunicado = comunicados[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  // Navegar a la vista del comunicado
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/comunicado_detail',
+                                      arguments: comunicado, // Pasar el comunicado actual
+                                    );
+                                },
+                                child: Card(
+                                  elevation: 2,
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Título
+                                        Container(
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: Colors.lightBlue.shade100,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            comunicado.asunto,
+                                            style: TextStyle(
+                                              color: Colors.blueGrey,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        // Contenido
+                                        Text(
+                                          comunicado.contenido,
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        // Hora
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: Text(
+                                            comunicado.fechaEnvio
+                                                .split(' ')[1].split(':').sublist(0, 2).join(':') +
+                                                // Agregar AM o PM
+                                                (int.parse(comunicado.fechaEnvio.split(' ')[1].split(':')[0]) > 12 ? ' PM' : ' AM'),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
                         }
 
-                        final comunicados = snapshot.data!;
-
-                        return ListView.builder(
-                          itemCount: comunicados.length,
-                          itemBuilder: (context, index) {
-                            final comunicado = comunicados[index];
-                            return GestureDetector(
-                              onTap: () {
-                                // Navegar a la vista del comunicado
-                              },
-                              child: Card(
-                                elevation: 2,
-                                margin: const EdgeInsets.symmetric(vertical: 8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: ListTile(
-                                  title: Text(
-                                    comunicado.asunto,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    comunicado.contenido,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  trailing: Text(
-                                    '${comunicado.fechaEnvio.hour}:${comunicado.fechaEnvio.minute} AM',
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        );
+                        return const Center(
+                            child: Text('No hay comunicados disponibles'));
                       },
                     ),
                   ),

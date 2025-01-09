@@ -1,13 +1,11 @@
-// import 'package:activities_repository/activities_repository.dart';
+import 'package:agenda_mobile/modules/dashboard/blocs/comunicados/comunicados_bloc.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:flutter_planner/planner/planner.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:table_calendar/table_calendar.dart';// Asegúrate de importar el Bloc
 
 class PlannerCalendar extends StatefulWidget {
   const PlannerCalendar({
     Key? key,
-    // required this.currentSize,
   }) : super(key: key);
 
   @override
@@ -17,31 +15,12 @@ class PlannerCalendar extends StatefulWidget {
 class _PlannerCalendarState extends State<PlannerCalendar> {
   DateTime _daySelected = DateTime.now();
 
-  // final PlannerSize currentSize;
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     late bool formatButtonVisible;
 
-    // if (currentSize == PlannerSize.large) {
-    //   formatButtonVisible = false;
-    // } else {
     formatButtonVisible = true;
-    // }
-
-    // final calendarFormat = currentSize == PlannerSize.large
-    //     ? CalendarFormat.month
-    //     : CalendarFormat.week;
-
-    // final selectedDay = context.select(
-    //   (PlannerBloc bloc) => bloc.state.selectedDay,
-    // );
-
-    // final focusedDay = context.select(
-    //   (PlannerBloc bloc) => bloc.state.focusedDay,
-    // );
-
-    // final events = context.select((PlannerBloc bloc) => bloc.state.events);
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -49,7 +28,6 @@ class _PlannerCalendarState extends State<PlannerCalendar> {
         borderRadius: BorderRadius.circular(15),
       ),
       child: TableCalendar<Object?>(
-        // locale: ',
         rowHeight: 40,
         startingDayOfWeek: StartingDayOfWeek.monday,
         headerStyle: HeaderStyle(
@@ -57,41 +35,26 @@ class _PlannerCalendarState extends State<PlannerCalendar> {
         ),
         calendarFormat: CalendarFormat.twoWeeks,
         calendarStyle: CalendarStyle(
-          // todayTextStyle: Theme.of(context)
-          // .textTheme
-          // .bodyText2!
-          // .copyWith(color: Theme.of(context).colorScheme.onPrimary),
           todayDecoration: BoxDecoration(
             color: Theme.of(context).primaryColorLight,
             shape: BoxShape.circle,
           ),
-          // selectedTextStyle: Theme.of(context)
-          // .textTheme
-          // .bodyText2!
-          // .copyWith(color: Theme.of(context).colorScheme.onPrimary),
-          // selectedDecoration: BoxDecoration(
-          //   color: Theme.of(context).pricontext
-          //   .read<PlannerBloc>()
-          //   .add(PlannerFocusedDayChanged(focusedDay))maryColor,
-          //   shape: BoxShape.circle,
-          // ),
         ),
-        firstDay: DateTime.now().subtract(
-          const Duration(days: 365 * 2),
-        ),
+        firstDay: DateTime.now().subtract(const Duration(days: 365 * 2)),
         lastDay: DateTime.now().add(const Duration(days: 365 * 2)),
         focusedDay: _daySelected,
-        // eventLoader: (day) => _filterEvents(day: day, events: events),
-        selectedDayPredicate: (day) => isSameDay(
-          day,
-          _daySelected,
-        ),
-        onDaySelected: (selectedDay, focusedDay) => {
+        selectedDayPredicate: (day) => isSameDay(day, _daySelected),
+        onDaySelected: (selectedDay, focusedDay) {
           setState(() {
             _daySelected = selectedDay;
-          }),
+          });
+
+          // Formateamos la fecha a 'yyyy-MM-dd'
+          final fechaString = "${selectedDay.year}-${selectedDay.month.toString().padLeft(2, '0')}-${selectedDay.day.toString().padLeft(2, '0')}";
+
+          // Disparamos el evento FetchComunicadosEvent con la fecha seleccionada
+          context.read<ComunicadoBloc>().add(FetchComunicadosEvent(fecha: fechaString));
         },
-        // onPageChanged: (focusedDay) => {_daySelected = focusedDay},
       ),
     );
   }
